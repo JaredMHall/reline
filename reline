@@ -1,0 +1,205 @@
+#!/usr/bin/env python
+import sys
+import argparse
+#
+#      ___           ___           ___                   ___           ___     
+#     /\  \         /\  \         /\__\      ___        /\__\         /\  \    
+#    /::\  \       /::\  \       /:/  /     /\  \      /::|  |       /::\  \   
+#   /:/\:\  \     /:/\:\  \     /:/  /      \:\  \    /:|:|  |      /:/\:\  \  
+#  /::\~\:\  \   /::\~\:\  \   /:/  /       /::\__\  /:/|:|  |__   /::\~\:\  \ 
+# /:/\:\ \:\__\ /:/\:\ \:\__\ /:/__/     __/:/\/__/ /:/ |:| /\__\ /:/\:\ \:\__\
+# \/_|::\/:/  / \:\~\:\ \/__/ \:\  \    /\/:/  /    \/__|:|/:/  / \:\~\:\ \/__/
+#    |:|::/  /   \:\ \:\__\    \:\  \   \::/__/         |:/:/  /   \:\ \:\__\  
+#    |:|\/__/     \:\ \/__/     \:\  \   \:\__\         |::/  /     \:\ \/__/  
+#    |:|  |        \:\__\        \:\__\   \/__/         /:/  /       \:\__\    
+#     \|__|         \/__/         \/__/                 \/__/         \/__/    
+#
+# Author: Jared Marshall Hall
+# License: MIT License
+# Contact: hall.jared.m@gmail.com
+# Created: August 02, 2015
+# Purpose: Change the number of words/characters per line for text files/text input.
+# Why: There are other command line tools that can reformat text in 
+#     this way but none that I am aware of specifically for this purpose.
+# Uses: Can be use with a file as input, or a pipe. Default setting splits lines
+#     by number of words
+# Installation: Can be added to usr/local/bin
+#     like so (for calling straight from the command line regardless of current folder):
+#         cd /usr/local/bin (command below must be called from within this folder)
+#         sudo ln -s <path_to_reline/reline>  
+#
+#     Donate Bitcoin:
+#     1AYk yF8P 1k19 NpAA xxEm WBa6 rp7g wgHz dr
+#
+#     Donate Dogecoin:
+#     DBGX4dwhD7SHhfcgzKjSZ2yJDhruAPgPUP
+#
+#     Donate via Paypal:
+#     http://bit.ly/1klxN1M
+#
+
+# get the number of arguments 
+argc = len(sys.argv)
+
+parser = argparse.ArgumentParser()
+
+if sys.stdin.isatty(): # check to see if we are using a text file ...
+    parser.add_argument('filename', help='name of file')
+    parser.add_argument('width', help='specify width', type=int)
+    parser.add_argument('-c', '--chars', help='count by characters, do not split words (may exceed width)', action='store_true', required=False)
+    parser.add_argument('-sw', '--split-words', help='count by characters, split words', action='store_true', required=False)
+    parser.add_argument('-i', '--info', help='print number of words and lines', action='store_true', required=False)
+    args = vars(parser.parse_args())
+else: # ... or a pipe
+    #parser.add_argument('pipe', type=argparse.FileType('r'), help='text to from pipe')
+    parser.add_argument('width', help='specify width', type=int)
+    parser.add_argument('-c', '--chars', help='count by characters, do not split words (may exceed width)', action='store_true', required=False)
+    parser.add_argument('-sw', '--split-words', help='count by characters, split words', action='store_true', required=False)
+    parser.add_argument('-i', '--info', help='print number of words and lines', action='store_true', required=False)
+    args = vars(parser.parse_args())
+
+# add counters for iteration and information
+line_counter = 0
+word_counter = 0
+char_counter = 1
+space_counter = 0
+info_flag = 0
+
+# if info flag is on
+if (args['info']):
+    info_flag = 1
+
+if ('filename' in args): # if it's a file
+    # assign arguments to variables to avoid magic numbers
+    FILENAME = args['filename']
+    # open the file -- make sure first argument is a file
+ 
+    try: 
+        textfile = open(FILENAME, 'r')
+        LINE_WIDTH = args['width']
+    except:
+        print "%sError: File %s not found!%s" % ('\033[41m', FILENAME, '\033[0m')
+        sys.exit()
+    # loop through each word of the text file
+    if (args['chars']):
+        lines = list(textfile.read().replace('\n',''))
+        #print lines
+        for char in lines:
+            # print "character " + str(char_counter)
+            
+            if (char_counter > (LINE_WIDTH - (LINE_WIDTH/3))):
+                # print "character " + str(char_counter)
+                if(char.isspace()):           
+                    # DEBUUUUG
+                    if (info_flag == 1):
+                        sys.stdout.write(" (" + str(char_counter) + " characters)")     
+                    print "" # print new line
+                    line_counter += 1
+                    sys.stdout.write(char)
+                    char_counter = 1
+                else:
+                    sys.stdout.write(char)
+                    char_counter += 1
+            else:
+                sys.stdout.write(char)
+                char_counter += 1
+    if (args['split_words']):
+        lines = list(textfile.read().replace('\n',''))
+        #print lines
+        for char in lines:
+            # print "character " + str(char_counter)
+            if (char_counter == LINE_WIDTH):
+                if (info_flag == 1):
+                    sys.stdout.write(" (" + str(char_counter) + " characters)")     
+                # print "character " + str(char_counter)
+                print "" # print new line
+                line_counter += 1
+                sys.stdout.write(char)
+                char_counter = 1
+            else:
+                sys.stdout.write(char)
+                char_counter += 1
+    else:
+        # put text file words into a text array
+        lines = textfile.read().split()
+        for word in lines:
+            if (word_counter % LINE_WIDTH == 0):
+                if (info_flag == 1):
+                    sys.stdout.write(" (" + str(char_counter) + " words)") 
+                print "" 
+                line_counter += 1
+                sys.stdout.write(word + " ")
+                word_counter += 1
+                char_counter = 1
+            else:
+                sys.stdout.write(word + " ")
+                word_counter += 1
+                char_counter += 1
+
+else: # if it's a pipe
+    LINE_WIDTH_PIPE = args['width']
+    textfile = sys.stdin.read()
+    # loop through each word of the pipe
+    if (args['chars']):
+        print "chars heeeeeerererere"
+        pipe_lines = list(textfile.replace('\n',''))
+        #print lines
+        for char in pipe_lines:
+            # print "character " + str(char_counter)
+            if (char_counter > (LINE_WIDTH_PIPE - (LINE_WIDTH_PIPE/3))):
+                # print "character " + str(char_counter)
+                if(char.isspace()):           
+                    # DEBUUUUG
+                    # sys.stdout.write("(" + str(char_counter) + " characters)")
+                    if (info_flag == 1):
+                        sys.stdout.write(" (" + str(char_counter) + " characters)") 
+                    print "" # print new line
+                    line_counter += 1
+                    sys.stdout.write(char)
+                    char_counter = 1
+                else:
+                    sys.stdout.write(char)
+                    char_counter += 1
+            else:
+                sys.stdout.write(char)
+                char_counter += 1
+    elif (args['split_words']):
+        pipe_lines = list(textfile.replace('\n',''))
+        #print lines
+        for char in pipe_lines:
+            # print "character " + str(char_counter)
+            if (char_counter == LINE_WIDTH_PIPE):
+                # print "character " + str(char_counter)
+                if (info_flag == 1):
+                    sys.stdout.write(" (" + str(char_counter) + " characters)")                 
+                print "" # print new line
+                line_counter += 1
+                sys.stdout.write(char)
+                char_counter = 1
+            else:
+                sys.stdout.write(char)
+                char_counter += 1                
+    else:
+        # put piped words into a text array
+        pipe_lines = textfile.split()
+        for word in pipe_lines:
+            if (word_counter % LINE_WIDTH_PIPE == 0):
+                if (info_flag == 1):
+                    sys.stdout.write(" (" + str(char_counter) + " words)")                 
+                print "" 
+                line_counter += 1
+                sys.stdout.write(word + " ")
+                word_counter += 1
+                char_counter = 1
+            else:
+                sys.stdout.write(word + " ")
+                word_counter += 1
+                char_counter += 1
+
+# print new line
+print ""
+
+# if info flag is on
+if (args['info']):
+    print "\n\n\033[36mNumber of lines: %s\033[0m" % (line_counter)
+
