@@ -31,7 +31,7 @@ Same as the above except no text file is specified (I am yet to think of any goo
 
 ## Testing
 So far I've tested this on OSX mavericks and Linux Mint 17.2 'Rafaela'  
-although it should fucntion on any *nix system that has python 2.7  
+although it should fucntion on any *nix system running python 2.7  
   
 ## Warning  
 The current version separates words by spaces, which may lead to some unexpected results.  
