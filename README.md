@@ -35,7 +35,7 @@ although it should fucntion on any *nix system that has python 2.7
   
 ## Warning  
 The current version separates words by spaces, which may lead to some unexpected results.  
-Also, currently, it treats any punctuation or number that has spaces on either side as a word as well.  
+Also, currently, it treats any punctuation or number that has spaces on both sides as a word as well.  
 
 
 
