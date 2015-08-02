@@ -5,7 +5,7 @@
 ### Using a text file as input
 Reline is a little command line tool with the specific job of reformatting text width.  
 
-So let's say you have a textfile, let's called it **my_file.txt** and its line width is around 18 words per line.  
+So let's say you have a textfile called **my_file.txt** and its line width is around 18 words per line.  
 You could do something like this...  
 `reline my_file.txt 8`  
 which would in turn decrease the line width to a predictable 8 words per line.  
