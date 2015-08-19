@@ -141,7 +141,6 @@ else: # if it's a pipe
     textfile = sys.stdin.read()
     # loop through each word of the pipe
     if (args['chars']):
-        print "chars heeeeeerererere"
         pipe_lines = list(textfile.replace('\n',''))
         #print lines
         for char in pipe_lines:
